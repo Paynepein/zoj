@@ -82,14 +82,32 @@ void Choose(char **a,int i,int j,int n,int *max)
             }
         }
     }
-    if(i==n-1 && j==n-1)
+    for(int k=i;k<n;k++)
     {
-        Calculate(b,n,max);
-    }else if(j==n-1){
-        Choose(b,i+1,0,n,max);
-    }else{
-        Choose(b,i,j+1,n,max);
+        int l;
+        if(k==i)
+        {
+            l = j;
+        }else
+        {
+            l = 0;
+        }
+        for(;l<n;l++)
+        {
+            if(k==n-1 && l==n-1)
+            {
+                Calculate(b,n,max);
+                return;
+            }else if(l == n-1)
+            {
+                Choose(b,k+1,0,n,max);
+            }else
+            {
+                Choose(b,k,l+1,n,max);
+            }
+        }
     }
+
     for(int i=0;i<j;i++)
     {
         delete[]b[i];
@@ -125,6 +143,7 @@ int main()
             }
         }
         cout<<max<<endl;
+        max = 0;
     }
     for(int i=0;i<n;i++)
     {
