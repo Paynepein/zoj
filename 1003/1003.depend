@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1417968195 source:e:\myrespository\zoj\1003\main.cpp
+	<iostream>
+	<cstdio>
+	<vector>
+	<algorithm>
+
