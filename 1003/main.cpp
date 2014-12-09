@@ -3,61 +3,35 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
-int Factor(int tmp)
+bool isOK(vector<int> v);
+int isupheld(vector<int> vhigh,vector<int> vlow);
+bool isFactor(vector<int> vhigh,vector<int> vlow,int tmp = 1)
 {
-    for(int i=100;i>1;i--)
+    if(!isOK(vlow))
+        return false;
+    vector<int> vmhigh(vhigh);
+    vmhigh.reserve(100);
+    for(vector<int>::iterator iter = vhigh.begin();iter!=vhigh.end();)
     {
-        if(tmp%i==0)
+        if(tmp == 1 || *iter/tmp == 0 && find(vhigh.begin(),vhigh.end(),tmp) == vhigh.end() && find(vhigh.begin(),vhigh.end(),*iter/tmp) == vhigh.end() && tmp != *iter/tmp)
         {
-            return i;
-        }
-    }
-    return -1;
-}
-
-bool Slice(vector<int> &large)
-{
-    int tmp,fac;
-    for(vector<int>::iterator iter=large.begin();iter!=large.end();)
-    {
-        if(*iter>100)
-        {
-            tmp = *iter;
-            fac = Factor(tmp);
-            if(fac == -1)
-                return false;
-            large.push_back(fac);
-            large.push_back(tmp/fac);
-            iter = large.erase(iter);
-            if(tmp/fac>100)
-                return Slice(large);
+            vhigh.push_back(tmp);
+            vhigh.push_back(*iter/tmp);
+            iter = vhigh.erase(iter);
+            if(isupheld(vhigh,vlow))
+                return true;
+            else if(isFactor(vhigh,vlow))
+            {
+                return true;
+            }
         }else
         {
             iter++;
         }
     }
-    return true;
-}
-
-bool Slice(vector<int> &large,int big)
-{
-    vector<int>::iterator findit = find(large.begin(),large.end(),big);
-    if(findit==large.end())
-    {
-        cout<<"error"<<endl;
-        return false;
-    }else
-    {
-        int tmp = Factor(big);
-        if(tmp == -1)
-            return false;
-        large.erase(findit);
-        large.push_back(tmp);
-        large.push_back(big/tmp);
+    if(isFactor(vmhigh,vlow,tmp+1))
         return true;
-
-    }
+    return false;
 }
 
 bool isOK(vector<int> v)
@@ -86,39 +60,45 @@ int isupheld(vector<int> vhigh,vector<int> vlow)
     return -1;
 }
 
-bool Referee(vector<int> &vhigh,vector<int> &vlow)
+bool Referee(vector<int> vhigh,vector<int> vlow,int small = 1)
 {
-    if(!isOK(vlow))
+    vector<int> vmlow(vlow);
+    vmlow.reserve(100);
+    vector<int>::iterator iter;
+    for(iter = vmlow.begin();iter!=vmlow.end();)
     {
-        if(!Slice(vlow))
+        if(small == 1 || *iter%small == 0 && find(vmlow.begin(),vmlow.end(),small) == vmlow.end() && find(vmlow.begin(),vmlow.end(),*iter/small) == vmlow.end() && small != *iter/small)
         {
-            return true;
+            vmlow.push_back(small);
+            vmlow.push_back(*iter/small);
+            iter = vmlow.erase(iter);
+            if(isFactor(vhigh,vmlow))
+            {
+                return true;
+            }else if(Referee(vhigh,vmlow))
+            {
+                return true;
+            }
+        }else
+        {
+            iter++;
         }
     }
-    if(!isOK(vhigh))
+    if(Referee(vhigh,vlow,small+1))
     {
-        if(!Slice(vhigh))
-        {
-            return false;
-        }
+        return true;
     }
-    int index = isupheld(vhigh,vlow);
-    if(index != -1)
-    {
-        Slice(vhigh,vhigh.at(index));
-        return Referee(vhigh,vlow);
-    }else
-    {
-        return false;
-    }
+    return false;
 }
 
 int main()
 {
     int high,low;
     vector<int>vhigh,vlow;
-    while(scanf("%d%d",&high,&low) == 2)
+    while(cin>>high>>low)
     {
+        vhigh.reserve(100);
+        vlow.reserve(100);
         if(high<low)
         {
             int tmp = high;
@@ -133,12 +113,6 @@ int main()
             cout<<low<<endl;
         vhigh.clear();
         vlow.clear();
-
-//        for(vector<int>::iterator iter = vhigh.begin();iter!=vhigh.end();iter++)
-//        {
-//            cout<<*iter<<endl;
-//        }
     }
-
     return 0;
 }
