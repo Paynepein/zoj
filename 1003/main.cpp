@@ -7,20 +7,33 @@ bool isOK(vector<int> v);
 int isupheld(vector<int> vhigh,vector<int> vlow);
 bool isFactor(vector<int> vhigh,vector<int> vlow,int tmp = 1)
 {
+    int flag = true;
+    if(tmp >100)
+        return false;
     if(!isOK(vlow))
         return false;
     vector<int> vmhigh(vhigh);
     vmhigh.reserve(100);
+    if(!isOK(vhigh))
+    {
+        flag = false;
+    }
     for(vector<int>::iterator iter = vhigh.begin();iter!=vhigh.end();)
     {
-        if(tmp == 1 || *iter/tmp == 0 && find(vhigh.begin(),vhigh.end(),tmp) == vhigh.end() && find(vhigh.begin(),vhigh.end(),*iter/tmp) == vhigh.end() && tmp != *iter/tmp)
+        if((flag && tmp == 1) || (tmp != 1 && *iter%tmp == 0 && find(vhigh.begin(),vhigh.end(),tmp) == vhigh.end() && find(vhigh.begin(),vhigh.end(),*iter/tmp) == vhigh.end() && tmp != *iter/tmp))
         {
-            vhigh.push_back(tmp);
-            vhigh.push_back(*iter/tmp);
-            iter = vhigh.erase(iter);
+            if(tmp != 1)
+            {
+                vhigh.push_back(tmp);
+                vhigh.push_back(*iter/tmp);
+                iter = vhigh.erase(iter);
+            }
+
+
+
             if(isupheld(vhigh,vlow))
                 return true;
-            else if(isFactor(vhigh,vlow))
+            else if(isFactor(vhigh,vlow) == -1)
             {
                 return true;
             }
@@ -62,16 +75,25 @@ int isupheld(vector<int> vhigh,vector<int> vlow)
 
 bool Referee(vector<int> vhigh,vector<int> vlow,int small = 1)
 {
+    int flag = true;
+    if(small >100)
+        return false;
     vector<int> vmlow(vlow);
     vmlow.reserve(100);
     vector<int>::iterator iter;
+    if(!isOK(vlow))
+        flag = false;
     for(iter = vmlow.begin();iter!=vmlow.end();)
     {
-        if(small == 1 || *iter%small == 0 && find(vmlow.begin(),vmlow.end(),small) == vmlow.end() && find(vmlow.begin(),vmlow.end(),*iter/small) == vmlow.end() && small != *iter/small)
+        if((flag && small == 1) || (small != 1 && *iter%small == 0 && find(vmlow.begin(),vmlow.end(),small) == vmlow.end() && find(vmlow.begin(),vmlow.end(),*iter/small) == vmlow.end() && small != *iter/small))
         {
-            vmlow.push_back(small);
-            vmlow.push_back(*iter/small);
-            iter = vmlow.erase(iter);
+            if(small != 1)
+            {
+                vmlow.push_back(small);
+                vmlow.push_back(*iter/small);
+                iter = vmlow.erase(iter);
+            }
+
             if(isFactor(vhigh,vmlow))
             {
                 return true;
